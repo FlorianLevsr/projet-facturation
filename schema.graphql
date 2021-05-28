@@ -1,0 +1,125 @@
+"""
+An authenticated user.
+"""
+type User {
+    "The user's Auth0 ID."
+    auth0Id: String! @unique
+    "Company in which the user is employed."
+    company: Company!
+}
+
+"""
+A company which can be either a client or a service provider.
+"""
+type Company {
+    "The name of the company."
+    name: String
+    "The SIRET identifier of the company."
+    siret: String @unique
+    "The IBAN account number of the company."
+    iban: String @unique
+    "The address of the company."
+    address: String
+    "A list of all users employed by the company."
+    employees: [User!] @relation
+    "A list of all projects created by the company."
+    projects: [Project!] @relation(name: "project_owner")
+    "A list of all projects the company is authorized to position freelancers."
+    authorizedProjects: [Project!] @relation(name: "authorized_project")
+    "A list of all mission units in which the company acts as a service provider."
+    providedUnits: [MissionUnit!] @relation(name: "provided_units")
+    "A list of all mission units in which the company acts as a freelancer."
+    acceptedUnits: [MissionUnit!] @relation(name: "accepted_units")
+    "A list of all mission offers received by the company in the capacity of a freelancer, from a service provider."
+    offeredMissions: [MissionOffer!] @relation(name: "offered_missions")
+    "A list of all mission offers sent by the company in the capacity of a service provider, to a freelancer."
+    offeringMissions: [MissionOffer!]@relation(name: "offering_company")
+    "A list of all invoices issued by the company, in the capacity of a seller."
+    issuedInvoices: [Invoice!] @relation(name: "seller_company")
+    "A list of all invoices received by the company, in the capacity of a client."
+    receivedInvoices: [Invoice!] @relation(name: "client_company")
+}
+
+"""
+A container for an array of missions linked together.
+"""
+type Project {
+    "The name of the project."
+    name: String
+    "The place in which the project is to take place."
+    place: String
+    "The default mission unit's rate, in euros."
+    rate: Int
+    "The company which initiated the project."
+    owningCompany: Company! @relation(name: "project_owner")
+    "A list of all companies authorized to position freelancers in the project."
+    authorizedCompanies: [Company!] @relation(name: "authorized_project")
+    "A list of all missions associated with the project."
+    missions: [Mission!]
+}
+
+"""
+A mission.
+"""
+type Mission {
+    "The name of the mission."
+    name: String
+    "The mission unit's rate, in euros. Overrides the project's default unit rate."
+    rate: Int
+    "The project associated with the mission."
+    project: Project! @relation
+    "A list of all mission units associated with the mission."
+    units: [MissionUnit!] @relation
+}
+
+"""
+A time unit associated with a mission (typically, a workday).
+"""
+type MissionUnit {
+    "The date at which the mission unit occurs."
+    date: Date
+    "The quantity of labout units the mission unit is worth."
+    quantity: Int
+    "The mission the unit is associated with."
+    mission: Mission!
+    "The company that acts as a service provider for the mission unit."
+    provider: Company @relation(name: "provided_units")
+    "The company that acts as a freelancer for the mission unit."
+    freelancer: Company @relation(name: "accepted_units")
+    "A list of all offers to work on the mission unit."
+    missionOffers: [MissionOffer!] @relation
+}
+
+"""
+An offer made by a service provider to a freelancer, to work on a specific mission unit.
+"""
+type MissionOffer {
+    "The date at which the offer was issued."
+    createdAt: Date
+    "The current status of the offer. TODO: Add a list of all possible values and their meaning."
+    status: Int
+    "The company that was offered to work on the mission unit."
+    offeredCompany: Company! @relation(name: "offered_missions")
+    "The company that issued the offer."
+    offeringCompany: Company! @relation(name: "offering_company")
+    "The mission unit associated with the offer."
+    missionUnit: MissionUnit!
+}
+
+"""
+An invoice.
+"""
+type Invoice {
+    "The identifying number of the invoice."
+    number: String! @unique
+    "The date at which the invoice was issued."
+    issuedDate: Date
+    "The date before which the invoice must be payed."
+    dueDate: Date
+    "Whether the invoice has been paid."
+    paid: Boolean
+    "The company which received the invoice."
+    clientCompany: Company! @relation(name: "client_company")
+    "The company which issued the invoice."
+    sellerCompany: Company! @relation(name: "seller_company")
+}
