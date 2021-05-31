@@ -4,6 +4,8 @@ An authenticated user.
 type User {
     "The user's Auth0 ID."
     auth0Id: String! @unique
+    "The user's name."
+    displayName: String
     "Company in which the user is employed."
     company: Company!
 }

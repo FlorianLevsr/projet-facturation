@@ -148,33 +148,60 @@ Un prestataire/une société de service a la possibilité d'envoyer un email de 
 | - | - | - | - |
 | **User** |  |  |  |
 | auth0Id | Numéro d'identification d'un utilisateur | String | Généré par auth0 |
+| displayName | Nom et Prénom de l'employé | String | - |
+| company | employeur | Company | - |
 | | | | |
 | **Company** |  |  |  |
 | name | nom de l'entreprise | String | Peut être client, société de services ou prestataire |
 | siret | Numéro SIRET de l'entreprise | Number | - |
 | iban | Numéro IBAN de l'entreprise | String | - |
+| address | adresse de l'entreprise | String | - |
+| employees | liste des employés | [User] | - |
+| projects | liste des projets créés par l'entreprise | [Project] | - |
+| authorizedProjects | liste des projets pour lesquels l'entreprise est autorisée à positionner des prestataires | [Project] | - |
+| providedUnits | liste des unités de mission pour proposées par l'entreprise (en tant que société de service) | [MissionUnit] | - |
+| acceptedUnits | liste des unités de missions acceptées par l'entreprise (en tant que prestataire) | [MissionUnit] | - |
+| offeredMissions | liste des offres reçues (en tant que prestataire) | [MissionOffer] | - |
+| offeringMissions | list des des offres émises par l'entreprise (en tant que société de service) | [MissionOffer] | - |
+| issuedInvoices | liste des factures émises par l'entreprise, en tant que vendeur | [Invoice] | - |
+| receivedInvoices | liste des factures reçues par l'entreprise, en tant que client | [Invoice] | - |
 | | | | |
 | **Project** |  |  |  |
 | name | nom du projet | String | - |
 | place | lieu où se déroule le projet | String | - |
+| rate | tarif de base des unités du projet | Int | - |
+| owningCompany | entreprise qui a créé le projet | Company | - |
+| authorizedCompany | liste des entreprises autorisées à positionner des prestataires pour ce projet | [Company] | - |
+| missions | liste des missions associées au projet | [Mission] | - |
 | | | | |
 | **Mission** |  |  |  |
 | name | nom de la mission | String | - |
 | rate | tarif de la mission | String | - |
+| project | le projet auquel la mission appartient | Project | - |
+| units | le projet auquel les unités appartiennent | [MissionUnit] | -|
 | | | | |
 | **MissionUnit** |  |  |  |
 | date | date de l'unité de mission | Date | - |
 | quantity | quantité d'unité | Number | - |
+| mission | la mission associée à l'unité | Mission | - |
+| provider | l'entreprise qui propose cette unité (en tant que société de service) | Company | |
+| freelancer | l'entreprise qui accepte cette unité (en tant que prestataire) | Company | - |
+| missionOffers | liste de toutes les offres concernant l'unité | [MissionOffer] | - |
 | | | | |
 | **Missionoffer** |  |  |  |
 | createdAt | date de création de l'offre | Date | - |
-| status | Status de l'offre | String | - |
+| status | Status de l'offre | Int | ex: 1 - Accepté par un prestataire, 2 - En cours de positionnement |
+| offeredCompany | l'entreprise à qui l'offre est proposée (en tant que prestataire) | Company | - |
+| offeringCompany | l'entreprise qui propose l'offre (en tant que société de service) | | |
+| missionUnit | l'unité associée à l'offre | MissionUnit | |
 | | | | |
 | **Invoice** |  |  |  |
 | number | numéro de la facture | Number | - |
 | invoiceDate | date de la facture | Date | - |
 | dueDate | date de paiement | Date | - |
-| paid | status de la facture | Date | true: payée - false: impayée |
+| paid | status de la facture | Date | exemple: true: payée - false: impayée |
+| clientCompany | l'entreprise qui reçoit la facture (client) | Company | - |
+| sellerCompany | l'entreprise qui émet la facture (vendeur) | Company | - |
 | | | | |
 
 
